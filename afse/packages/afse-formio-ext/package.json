@@ -1,0 +1,31 @@
+{
+  "name": "afse-formio-ext",
+  "version": "0.1.0",
+  "description": "AFSE extension for the Form.io renderer: domain components (IBAN, ΑΦΜ, ΑΜΚΑ, amount), validators, builder group and translations.",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": ["dist"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "@formio/js": "^5.7.0"
+  },
+  "devDependencies": {
+    "@formio/js": "5.7.0"
+  }
+}

@@ -1,0 +1,68 @@
+body {
+  margin: 0;
+  background: #f6f7f9;
+}
+
+.pg-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  background: var(--afse-primary);
+  color: #fff;
+}
+
+.pg-header h1 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.pg-header nav {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.pg-header nav button {
+  border: 1px solid rgb(255 255 255 / 40%);
+  background: transparent;
+  color: inherit;
+  border-radius: 999px;
+  padding: 0.25rem 0.9rem;
+}
+
+.pg-header nav button.active {
+  background: #fff;
+  color: var(--afse-primary);
+}
+
+.pg-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.pg-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 2rem;
+}
+
+.pg-columns aside {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.pg-errors {
+  color: var(--afse-danger);
+  padding-left: 1rem;
+}
+
+@media (max-width: 720px) {
+  .pg-columns {
+    grid-template-columns: 1fr;
+  }
+}

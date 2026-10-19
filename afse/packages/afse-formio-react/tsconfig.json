@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["vitest/globals", "@testing-library/jest-dom"],
+    "paths": {
+      "afse-formio-ext": ["../afse-formio-ext/src/index.ts"]
+    }
+  },
+  "include": ["src", "test"]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "afse-formio-react",
+  "version": "0.1.0",
+  "description": "AFSE React form library. Renders and builds forms with the AFSE domain components; the Form.io engine and the afse-formio-ext extension stay behind this package's API.",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "files": ["dist"],
+  "sideEffects": ["*.css"],
+  "scripts": {
+    "build": "tsup && cp src/styles/styles.css dist/styles.css",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "dependencies": {
+    "@formio/js": "5.7.0",
+    "@formio/react": "6.2.2",
+    "afse-formio-ext": "0.1.0",
+    "bootstrap": "^5.3.3"
+  }
+}

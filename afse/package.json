@@ -1,0 +1,33 @@
+{
+  "name": "afse-formio-workspace",
+  "private": true,
+  "description": "AFSE React component library on top of the open-source Form.io renderer (@formio/js 5.x).",
+  "workspaces": [
+    "packages/afse-formio-ext",
+    "packages/afse-formio-react",
+    "apps/playground"
+  ],
+  "scripts": {
+    "build": "npm run build -w afse-formio-ext && npm run build -w afse-formio-react",
+    "typecheck": "npm run typecheck -w afse-formio-ext && npm run typecheck -w afse-formio-react && npm run typecheck -w afse-formio-playground",
+    "test": "npm run test -w afse-formio-ext && npm run test -w afse-formio-react",
+    "check:boundaries": "node scripts/check-boundaries.mjs",
+    "check": "npm run build && npm run typecheck && npm run test && npm run check:boundaries",
+    "dev": "npm run dev -w afse-formio-playground"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "jsdom": "^25.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsup": "^8.3.5",
+    "typescript": "~5.6.3",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

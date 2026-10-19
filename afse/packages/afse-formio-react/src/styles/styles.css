@@ -1,0 +1,47 @@
+/*
+ * AFSE form styles. Import once in the app:
+ *   import 'afse-formio-react/styles.css';
+ * It brings the Bootstrap 5 base the renderer's templates expect, the
+ * renderer's own styles, and the AFSE theme on top.
+ */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import '@formio/js/dist/formio.full.min.css';
+
+:root {
+  --afse-primary: #0b3d91;
+  --afse-primary-contrast: #ffffff;
+  --afse-danger: #b42318;
+  --afse-radius: 0.5rem;
+  --afse-field-gap: 1rem;
+  --afse-font: inherit;
+}
+
+.afse-form,
+.afse-form-builder {
+  font-family: var(--afse-font);
+  --bs-primary: var(--afse-primary);
+  --bs-border-radius: var(--afse-radius);
+  --bs-danger: var(--afse-danger);
+}
+
+.afse-form .formio-component {
+  margin-bottom: var(--afse-field-gap);
+}
+
+.afse-form .btn-primary,
+.afse-form-builder .btn-primary {
+  background-color: var(--afse-primary);
+  border-color: var(--afse-primary);
+  color: var(--afse-primary-contrast);
+}
+
+.afse-form .formio-component-afseIban input,
+.afse-form .formio-component-afseTaxId input,
+.afse-form .formio-component-afseAmka input {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.afse-submission-view .formio-component {
+  margin-bottom: 0.5rem;
+}
