@@ -1,10 +1,21 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["vitest/globals", "@testing-library/jest-dom"],
+    "types": [
+      "vitest/globals",
+      "@testing-library/jest-dom"
+    ],
     "paths": {
-      "afse-formio-ext": ["../afse-formio-ext/src/index.ts"]
+      "afse-formio-ext": [
+        "../afse-formio-ext/src/index.ts"
+      ],
+      "afse-formio-ext/validators": [
+        "../afse-formio-ext/src/validators/index.ts"
+      ]
     }
   },
-  "include": ["src", "test"]
+  "include": [
+    "src",
+    "test"
+  ]
 }

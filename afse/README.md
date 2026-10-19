@@ -8,7 +8,9 @@ upstream `formio/formio.js` `main` branch).
 | --- | --- | --- |
 | [`afse-formio-react`](packages/afse-formio-react) | The React component library: `AfseForm`, `AfseFormBuilder`, `AfseSubmissionView`, `AfseProvider`, `useAfseForm`, typed `fields`/`defineForm` helpers, `validators`, theme CSS. | Applications |
 | [`afse-formio-ext`](packages/afse-formio-ext) | AFSE's extension to Form.io: domain components (IBAN, ΑΦΜ, ΑΜΚΑ, EUR amount), validators, builder group, Greek translations. Framework-agnostic. | `afse-formio-react` only |
+| [`afse-formio-react-native`](packages/afse-formio-react-native) | Drop-in React Native / Expo plugin: `<AfseForm>` with the same props, forms, AFSE components and translations, plus `theme` and `autoHeight`. | Mobile apps |
 | [`apps/playground`](apps/playground) | Vite demo app: payment form, onboarding wizard, form builder. | — |
+| [`apps/mobile-playground`](apps/mobile-playground) | Expo demo app with Maestro device flows. | — |
 
 ## Boundaries
 
@@ -25,7 +27,21 @@ upstream `formio/formio.js` `main` branch).
           ▼                               ▼
    afse-formio-ext  ───────────────▶  @formio/js 5.7 / @formio/react 6.2
    (public Form.io API only, no React)
+
+   mobile app
+        │  imports only "afse-formio-react-native"
+        ▼
+ ┌───────────────── afse-formio-react-native ─────────────────┐
+ │  native side: <AfseForm> ── WebView ──┐                    │
+ │  (uses only afse-formio-react/schema) │  protocol.ts       │
+ │                                       ▼                    │
+ │  host page (bundled HTML) ──▶ afse-formio-react (public)   │
+ └────────────────────────────────────────────────────────────┘
 ```
+
+`afse-formio-react/schema` is the platform-free part of the web library
+(`defineForm`, `fields`, `validators`, types). It is what lets the native side
+share form definitions without loading the browser engine.
 
 Think of Form.io as the engine of a car, `afse-formio-ext` as AFSE's custom
 parts fitted to that engine, and `afse-formio-react` as the dashboard: drivers
@@ -38,7 +54,10 @@ The rules are checked by `npm run check:boundaries`
 1. Inside `afse-formio-react`, only `src/internal/**` may import `@formio/*` or `afse-formio-ext`.
 2. `afse-formio-react`'s published `.d.ts` files mention neither, so no engine type leaks into apps.
 3. `afse-formio-ext` uses only the engine's public entry points (no deep `@formio/js/lib/...` imports) and never imports React.
-4. Apps import `afse-formio-react` (and its stylesheet) only.
+4. Web apps import `afse-formio-react` (and its stylesheet) only.
+5. `afse-formio-react/schema` stays free of the engine, the components and React.
+6. `afse-formio-react-native`'s native code imports only React Native, the WebView and `afse-formio-react/schema`; its WebView page uses only the public `afse-formio-react` API.
+7. Mobile apps import `afse-formio-react-native` only.
 
 `afse-formio-react` lists the engine and the extension as regular
 `dependencies`; apps never install or configure them.
@@ -108,7 +127,7 @@ A new domain field goes into `afse-formio-ext`, then gets a typed helper in
    `builderInfo` with `group: 'afse'`, and register it in `afseComponents`.
    It is then picked up by the builder group automatically.
 3. **Messages:** add the error key to `afseTranslations` (`en` and `el`).
-4. **React helper:** add `fields.<name>` in `packages/afse-formio-react/src/schema/fields.ts`.
+4. **React helper:** add `fields.<name>` in `packages/afse-formio-react/src/schema/fields.ts`. Mobile gets it automatically.
 5. **Tests:** cover the validator and component in `afse-formio-ext/test`, and
    the helper in `afse-formio-react/test`.
 
@@ -125,7 +144,9 @@ domain checks in your own API with `validators`.
 cd afse
 npm install
 npm run check        # build, typecheck, unit tests, boundary check
-npm run dev          # playground on http://localhost:5173
+npm run e2e          # mobile form page end-to-end (Playwright, phone viewport)
+npm run dev          # web playground on http://localhost:5173
+npm run dev:mobile   # Expo dev server for the mobile playground
 ```
 
 Unit tests run with Vitest + jsdom; `afse-formio-react` tests import the

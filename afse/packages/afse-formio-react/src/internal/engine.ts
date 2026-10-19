@@ -9,11 +9,7 @@ import {
   afseBuilderGroups,
   afseEvalContext,
   afseTranslations,
-  formatIban,
   installAfseExtension,
-  isValidAmka,
-  isValidGreekTaxId,
-  isValidIban,
 } from 'afse-formio-ext';
 import type { AfseTranslations, AfseValidationError } from '../types';
 
@@ -127,10 +123,3 @@ export function toValidationErrors(errors: readonly EngineError[] | undefined): 
     rule: error.ruleName,
   }));
 }
-
-export const afseValidators = {
-  iban: isValidIban,
-  greekTaxId: isValidGreekTaxId,
-  amka: isValidAmka,
-  formatIban,
-};

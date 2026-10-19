@@ -1,4 +1,4 @@
-import { afseValidators } from './internal/engine';
+import { formatIban, isValidAmka, isValidGreekTaxId, isValidIban } from './internal/validators';
 
 /**
  * The AFSE domain checks, for use outside forms (e.g. API payload checks).
@@ -13,4 +13,9 @@ export const validators: {
   amka(value: unknown): boolean;
   /** Formats an IBAN in groups of four. */
   formatIban(value: string): string;
-} = afseValidators;
+} = {
+  iban: isValidIban,
+  greekTaxId: isValidGreekTaxId,
+  amka: isValidAmka,
+  formatIban,
+};

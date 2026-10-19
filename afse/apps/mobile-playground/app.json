@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "AFSE Forms",
+    "slug": "afse-forms-playground",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": { "bundleIdentifier": "eu.afse.forms.playground" },
+    "android": { "package": "eu.afse.forms.playground" }
+  }
+}

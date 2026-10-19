@@ -1,0 +1,56 @@
+/* Touch-friendly defaults for forms shown inside the app. */
+:root {
+  --afse-mobile-bg: #ffffff;
+  --afse-mobile-text: #1d2433;
+  --afse-mobile-font-size: 16px;
+  --afse-mobile-padding: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--afse-mobile-bg);
+  color: var(--afse-mobile-text);
+  font-size: var(--afse-mobile-font-size);
+  -webkit-tap-highlight-color: transparent;
+}
+
+html.afse-auto-height,
+html.afse-auto-height body {
+  overflow: hidden;
+}
+
+#root {
+  padding: var(--afse-mobile-padding);
+}
+
+/* 16px+ keeps iOS from zooming into focused inputs; 44px is the minimum touch target. */
+.afse-form input:not([type='checkbox']):not([type='radio']),
+.afse-form select,
+.afse-form textarea,
+.afse-form .form-control,
+.afse-form .choices__inner {
+  font-size: max(16px, var(--afse-mobile-font-size));
+  min-height: 44px;
+}
+
+.afse-form .form-check-input {
+  width: 1.4em;
+  height: 1.4em;
+}
+
+.afse-form .btn {
+  min-height: 48px;
+  font-size: max(16px, var(--afse-mobile-font-size));
+}
+
+.afse-form .formio-component-button .btn-primary,
+.afse-form .btn-wizard-nav-submit,
+.afse-form .btn-wizard-nav-next {
+  width: 100%;
+}
+
+.afse-form .pagination {
+  flex-wrap: wrap;
+}

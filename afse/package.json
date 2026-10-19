@@ -5,15 +5,19 @@
   "workspaces": [
     "packages/afse-formio-ext",
     "packages/afse-formio-react",
-    "apps/playground"
+    "packages/afse-formio-react-native",
+    "apps/playground",
+    "apps/mobile-playground"
   ],
   "scripts": {
-    "build": "npm run build -w afse-formio-ext && npm run build -w afse-formio-react",
-    "typecheck": "npm run typecheck -w afse-formio-ext && npm run typecheck -w afse-formio-react && npm run typecheck -w afse-formio-playground",
-    "test": "npm run test -w afse-formio-ext && npm run test -w afse-formio-react",
+    "build": "npm run build -w afse-formio-ext && npm run build -w afse-formio-react && npm run build -w afse-formio-react-native",
+    "typecheck": "npm run typecheck -w afse-formio-ext && npm run typecheck -w afse-formio-react && npm run typecheck -w afse-formio-react-native && npm run typecheck -w afse-formio-playground && npm run typecheck -w afse-formio-mobile-playground",
+    "test": "npm run test -w afse-formio-ext && npm run test -w afse-formio-react && npm run test -w afse-formio-react-native",
     "check:boundaries": "node scripts/check-boundaries.mjs",
     "check": "npm run build && npm run typecheck && npm run test && npm run check:boundaries",
-    "dev": "npm run dev -w afse-formio-playground"
+    "dev": "npm run dev -w afse-formio-playground",
+    "e2e": "npm run e2e -w afse-formio-react-native",
+    "dev:mobile": "npm run start -w afse-formio-mobile-playground"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",

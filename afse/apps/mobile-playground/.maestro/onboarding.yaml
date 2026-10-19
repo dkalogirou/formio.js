@@ -1,0 +1,14 @@
+appId: eu.afse.forms.playground
+---
+- launchApp
+- tapOn:
+    id: "tab-wizard"
+- extendedWaitUntil:
+    visible: "Full name"
+    timeout: 20000
+- tapOn: "Full name"
+- inputText: "Maria Papadopoulou"
+- tapOn: "Tax ID (ΑΦΜ)"
+- inputText: "123456789"
+- tapOn: "Next"
+- assertVisible: "Tax ID (ΑΦΜ) must be a valid Greek tax ID (ΑΦΜ)."

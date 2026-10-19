@@ -1,0 +1,44 @@
+{
+  "name": "afse-formio-react-native",
+  "version": "0.1.0",
+  "description": "AFSE forms for React Native / Expo. Drop-in <AfseForm> with the same forms, AFSE components, validation and translations as the web library.",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "react-native": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "react-native": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build:host": "node scripts/build-host.mjs",
+    "build": "npm run build:host && tsup",
+    "typecheck": "npm run build:host && tsc --noEmit",
+    "test": "npm run build:host && vitest run",
+    "e2e": "npm run build:host && playwright test"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-native": ">=0.72",
+    "react-native-webview": ">=13"
+  },
+  "dependencies": {
+    "afse-formio-react": "0.1.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "esbuild": "^0.24.2",
+    "react-native": "0.76.9",
+    "react-native-webview": "13.12.5"
+  }
+}
