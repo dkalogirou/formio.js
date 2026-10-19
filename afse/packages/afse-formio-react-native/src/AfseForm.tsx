@@ -244,12 +244,13 @@ function AfseFormInner<TData extends AfseFormData = AfseFormData>(
         setSupportMultipleWindows={false}
         allowsLinkPreview={false}
         onShouldStartLoadWithRequest={(request) => {
-          // Keep the form page in place; open real links in the system browser.
-          if (/^(about:|data:)/.test(request.url) || request.url === defaults.baseUrl) {
+          // Keep the form page in place (embedded frames such as reCAPTCHA may load);
+          // open links the user follows in the system browser instead.
+          if (request.isTopFrame === false || isFormPage(request.url, defaults.baseUrl)) {
             return true;
           }
-          if (request.navigationType === 'click') {
-            Linking.openURL(request.url);
+          if (/^(https?|mailto|tel):/i.test(request.url)) {
+            Linking.openURL(request.url).catch(() => undefined);
           }
           return false;
         }}
@@ -259,6 +260,14 @@ function AfseFormInner<TData extends AfseFormData = AfseFormData>(
       {!ready && <View style={styles.loading}>{loading ?? <ActivityIndicator />}</View>}
     </View>
   );
+}
+
+function isFormPage(url: string, baseUrl?: string): boolean {
+  if (/^(about:|data:)/.test(url)) {
+    return true;
+  }
+  const strip = (u: string) => u.replace(/[#?].*$/, '').replace(/\/+$/, '');
+  return Boolean(baseUrl) && strip(url) === strip(baseUrl!);
 }
 
 function mergeTranslations(...sources: (AfseTranslations | undefined)[]): AfseTranslations | undefined {

@@ -16,7 +16,7 @@
     "check:boundaries": "node scripts/check-boundaries.mjs",
     "check": "npm run build && npm run typecheck && npm run test && npm run check:boundaries",
     "dev": "npm run dev -w afse-formio-playground",
-    "e2e": "npm run e2e -w afse-formio-react-native",
+    "e2e": "npm run e2e -w afse-formio-react-native && npm run e2e:web -w afse-formio-mobile-playground",
     "dev:mobile": "npm run start -w afse-formio-mobile-playground"
   },
   "devDependencies": {

@@ -83,6 +83,10 @@ builder is web-only.
 * `npm run e2e`: Playwright drives the real form page on a phone-sized touch
   viewport and plays the native side of the bridge: typing, tapping, validation,
   submit, Greek, theming, wizards.
+* `apps/mobile-playground`, `npm run e2e:web`: the whole demo app (real app
+  code, real component, real form page) runs with react-native-web; only the
+  native WebView is swapped for an iframe that passes the same messages.
+  Playwright taps through payment, review, Greek and the wizard.
 * `apps/mobile-playground/.maestro`: on-device flows for the demo app
   ([Maestro](https://maestro.mobile.dev)): `npm run android && npm run e2e:device`.
 

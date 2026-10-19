@@ -151,12 +151,28 @@ describe('mobile AfseForm', () => {
     });
   });
 
-  it('keeps the form page in place and opens tapped links in the browser', () => {
+  it('keeps the form page in place and opens followed links in the browser', () => {
     render(<AfseForm form={form} />);
     const guard = webViewMock.props.onShouldStartLoadWithRequest;
     expect(guard({ url: 'about:blank' })).toBe(true);
-    expect(guard({ url: 'https://afse.eu/terms', navigationType: 'click' })).toBe(false);
+    expect(guard({ url: 'https://www.google.com/recaptcha/api2/anchor', isTopFrame: false })).toBe(true);
+    // Android does not report navigationType, so every top-level link counts.
+    expect(guard({ url: 'https://afse.eu/terms' })).toBe(false);
     expect(Linking.openURL).toHaveBeenCalledWith('https://afse.eu/terms');
+    expect(guard({ url: 'javascript:alert(1)' })).toBe(false);
+    expect(Linking.openURL).toHaveBeenCalledTimes(1);
+  });
+
+  it('lets the page load from the configured baseUrl', () => {
+    render(
+      <AfseProvider baseUrl="https://forms.afse.eu">
+        <AfseForm form={form} />
+      </AfseProvider>,
+    );
+    const guard = webViewMock.props.onShouldStartLoadWithRequest;
+    expect(webViewMock.props.source.baseUrl).toBe('https://forms.afse.eu');
+    expect(guard({ url: 'https://forms.afse.eu/' })).toBe(true);
+    expect(guard({ url: 'https://forms.afse.eu/#top' })).toBe(true);
   });
 
   it('passes data that looks like code through untouched', () => {

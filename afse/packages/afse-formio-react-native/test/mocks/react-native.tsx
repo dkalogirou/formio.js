@@ -13,6 +13,6 @@ export const View = ({ children, style, testID }: Props) => (
 );
 export const ActivityIndicator = () => <div data-testid="spinner" />;
 export const StyleSheet = { create: <T,>(styles: T) => styles, absoluteFillObject: { position: 'absolute' } };
-export const Linking = { openURL: vi.fn() };
+export const Linking = { openURL: vi.fn(() => Promise.resolve()) };
 export type StyleProp<T> = T | T[] | undefined;
 export type ViewStyle = Record<string, unknown>;

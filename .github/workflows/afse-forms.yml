@@ -22,7 +22,7 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run build -w afse-formio-playground
-      - name: Mobile end-to-end (form page on a phone viewport)
+      - name: Mobile end-to-end (form page, and the demo app with react-native-web)
         run: |
           npx -w afse-formio-react-native playwright install --with-deps chromium
           npm run e2e
