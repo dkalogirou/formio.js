@@ -19,6 +19,10 @@ describe('mobile AfseForm', () => {
   it('loads the bundled form page and configures it once the page boots', () => {
     render(<AfseForm form={form} language="el" />);
     expect(webViewMock.props.source.html).toContain('<div id="root"></div>');
+    // A real origin, so cookies and storage work in Android's WebView.
+    expect(webViewMock.props.source.baseUrl).toBe('https://afse-forms.invalid/');
+    expect(webViewMock.props.onShouldStartLoadWithRequest({ url: 'https://afse-forms.invalid/' })).toBe(true);
+    expect(webViewMock.props.domStorageEnabled).toBe(true);
     expect(webViewMock.sent()).toEqual([]);
     boot();
     expect(webViewMock.sent()).toEqual([
@@ -34,6 +38,18 @@ describe('mobile AfseForm', () => {
     act(() => webViewMock.emit({ type: 'ready' }));
     expect(screen.queryByTestId('spinner')).not.toBeInTheDocument();
     expect(onReady).toHaveBeenCalledOnce();
+  });
+
+  it('shows why the form failed to load instead of spinning forever', () => {
+    const onError = vi.fn();
+    render(<AfseForm form={form} onError={onError} testID="payment" />);
+    boot();
+    act(() => webViewMock.emit({ type: 'error', message: 'Unknown component: afseFoo' }));
+    expect(screen.getByTestId('payment-error')).toHaveTextContent('The form could not be loaded.');
+    expect(screen.getByTestId('payment-error')).toHaveTextContent('Unknown component: afseFoo');
+    expect(onError).toHaveBeenCalledWith('Unknown component: afseFoo');
+    act(() => webViewMock.emit({ type: 'ready' }));
+    expect(screen.queryByTestId('payment-error')).not.toBeInTheDocument();
   });
 
   it('forwards page events to the callbacks', () => {

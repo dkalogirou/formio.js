@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { defineForm, defineWizard, fields } from 'afse-formio-react/schema';
 import { NativeSide } from './native';
+import { HOST_HTML } from '../src/generated/host-html';
+import { encode, decode, type FromHost } from '../src/protocol';
 
 const payment = defineForm({
   title: 'Payment',
@@ -140,4 +142,49 @@ test('ignores messages that are not from the AFSE bridge', async ({ page }) => {
   await page.locator(input('beneficiary')).fill('still here');
   await expect(page.locator(input('beneficiary'))).toHaveValue('still here');
   expect((await native.messages()).filter((m) => m.type === 'error')).toEqual([]);
+});
+
+test('works with an opaque origin (Android WebView loading an HTML string)', async ({ page }) => {
+  // A sandboxed frame has an opaque origin: cookies and storage throw, as they
+  // can in Android's WebView. The page must still boot, render and submit.
+  await page.route('https://parent.afse.test/**', (route) =>
+    route.fulfill({ contentType: 'text/html', body: '<iframe id="f" sandbox="allow-scripts" style="width:390px;height:800px"></iframe>' }),
+  );
+  await page.goto('https://parent.afse.test/');
+  await page.evaluate(
+    ({ html, configure }) => {
+      const w = window as unknown as { received: string[] };
+      w.received = [];
+      const frame = document.getElementById('f') as HTMLIFrameElement;
+      window.addEventListener('message', (event) => {
+        w.received.push(String(event.data));
+        if (String(event.data).includes('"boot"')) frame.contentWindow!.postMessage(configure, '*');
+      });
+      const bridge =
+        "<script>window.ReactNativeWebView={postMessage:function(d){parent.postMessage(d,'*')}};" +
+        "window.addEventListener('message',function(e){window.__afseReceive&&window.__afseReceive(e.data)});</script>";
+      frame.srcdoc = html.replace('<head>', '<head>' + bridge);
+    },
+    {
+      html: HOST_HTML,
+      configure: encode({
+        type: 'configure',
+        config: { form: payment, language: 'en', readOnly: false, summary: false, hideSubmitButton: false, autoHeight: false },
+      }),
+    },
+  );
+  const received = async () =>
+    ((await page.evaluate(() => (window as unknown as { received: string[] }).received)) as string[])
+      .map((m) => decode<FromHost>(m))
+      .filter((m): m is FromHost => m !== null);
+
+  await expect.poll(async () => (await received()).map((m) => m.type)).toContain('ready');
+  expect((await received()).filter((m) => m.type === 'error')).toEqual([]);
+
+  const form = page.frameLocator('#f');
+  await form.locator(input('beneficiary')).fill('ACME');
+  await form.locator(input('iban')).fill('GR1601101250000000012300695');
+  await form.locator(input('amount')).fill('5');
+  await form.locator(payButton).tap();
+  await expect.poll(async () => (await received()).some((m) => m.type === 'submit')).toBe(true);
 });

@@ -11,7 +11,7 @@ import {
   type ReactNode,
   type Ref,
 } from 'react';
-import { ActivityIndicator, Linking, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { ActivityIndicator, Linking, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 import type {
   AfseChange,
@@ -74,6 +74,13 @@ export interface AfseMobileFormHandle<TData extends AfseFormData = AfseFormData>
   goToPage(page: number): Promise<void>;
 }
 
+/**
+ * Origin given to the bundled form page when no forms API `baseUrl` is set.
+ * Without one, Android loads it with an opaque origin where cookies and
+ * storage are unavailable. `.invalid` never resolves, so nothing is fetched from it.
+ */
+const DEFAULT_PAGE_ORIGIN = 'https://afse-forms.invalid/';
+
 type Pending = { resolve: (value: unknown) => void; reject: (reason: unknown) => void };
 
 function AfseFormInner<TData extends AfseFormData = AfseFormData>(
@@ -96,6 +103,7 @@ function AfseFormInner<TData extends AfseFormData = AfseFormData>(
     loading,
   } = props;
 
+  const pageOrigin = defaults.baseUrl ?? DEFAULT_PAGE_ORIGIN;
   const webView = useRef<WebView>(null);
   const booted = useRef(false);
   const lastConfig = useRef<string | null>(null);
@@ -104,6 +112,9 @@ function AfseFormInner<TData extends AfseFormData = AfseFormData>(
   const latest = useRef(props);
   latest.current = props;
   const [ready, setReady] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const readyRef = useRef(false);
+  readyRef.current = ready;
   const [height, setHeight] = useState<number | undefined>(undefined);
 
   const config = useMemo<HostConfig>(
@@ -192,10 +203,12 @@ function AfseFormInner<TData extends AfseFormData = AfseFormData>(
         booted.current = true;
         lastConfig.current = null;
         setReady(false);
+        setLoadError(null);
         sendConfig(config);
         break;
       case 'ready':
         setReady(true);
+        setLoadError(null);
         handlers.onReady?.();
         break;
       case 'submit':
@@ -226,6 +239,8 @@ function AfseFormInner<TData extends AfseFormData = AfseFormData>(
       }
       case 'error':
         (handlers.onError ?? ((m: string) => console.warn(`[AfseForm] ${m}`)))(message.message);
+        // Before the form is up, an error means it will not appear: say so instead of spinning forever.
+        if (!readyRef.current) setLoadError(message.message);
         break;
     }
   };
@@ -234,8 +249,10 @@ function AfseFormInner<TData extends AfseFormData = AfseFormData>(
     <View style={[autoHeight ? { height: height ?? 1 } : styles.fill, style]} testID={testID}>
       <WebView
         ref={webView}
-        source={{ html: HOST_HTML, baseUrl: defaults.baseUrl }}
+        source={{ html: HOST_HTML, baseUrl: pageOrigin }}
         originWhitelist={['*']}
+        javaScriptEnabled
+        domStorageEnabled
         onMessage={onMessage}
         scrollEnabled={!autoHeight}
         nestedScrollEnabled={!autoHeight}
@@ -246,7 +263,7 @@ function AfseFormInner<TData extends AfseFormData = AfseFormData>(
         onShouldStartLoadWithRequest={(request) => {
           // Keep the form page in place (embedded frames such as reCAPTCHA may load);
           // open links the user follows in the system browser instead.
-          if (request.isTopFrame === false || isFormPage(request.url, defaults.baseUrl)) {
+          if (request.isTopFrame === false || isFormPage(request.url, pageOrigin)) {
             return true;
           }
           if (/^(https?|mailto|tel):/i.test(request.url)) {
@@ -257,17 +274,28 @@ function AfseFormInner<TData extends AfseFormData = AfseFormData>(
         style={styles.webView}
         testID={testID ? `${testID}-webview` : undefined}
       />
-      {!ready && <View style={styles.loading}>{loading ?? <ActivityIndicator />}</View>}
+      {!ready && (
+        <View style={styles.loading}>
+          {loadError ? (
+            <Text style={styles.loadError} testID={testID ? `${testID}-error` : undefined}>
+              The form could not be loaded.{'\n'}
+              {loadError}
+            </Text>
+          ) : (
+            (loading ?? <ActivityIndicator />)
+          )}
+        </View>
+      )}
     </View>
   );
 }
 
-function isFormPage(url: string, baseUrl?: string): boolean {
+function isFormPage(url: string, pageOrigin: string): boolean {
   if (/^(about:|data:)/.test(url)) {
     return true;
   }
   const strip = (u: string) => u.replace(/[#?].*$/, '').replace(/\/+$/, '');
-  return Boolean(baseUrl) && strip(url) === strip(baseUrl!);
+  return strip(url) === strip(pageOrigin);
 }
 
 function mergeTranslations(...sources: (AfseTranslations | undefined)[]): AfseTranslations | undefined {
@@ -285,7 +313,8 @@ function mergeTranslations(...sources: (AfseTranslations | undefined)[]): AfseTr
 const styles = StyleSheet.create({
   fill: { flex: 1 },
   webView: { flex: 1, backgroundColor: 'transparent' },
-  loading: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
+  loading: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  loadError: { color: '#b42318', textAlign: 'center' },
 });
 
 /**

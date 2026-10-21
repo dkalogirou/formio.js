@@ -11,6 +11,7 @@ export const View = ({ children, style, testID }: Props) => (
     {children}
   </div>
 );
+export const Text = ({ children, testID }: Props) => <span data-testid={testID}>{children}</span>;
 export const ActivityIndicator = () => <div data-testid="spinner" />;
 export const StyleSheet = { create: <T,>(styles: T) => styles, absoluteFillObject: { position: 'absolute' } };
 export const Linking = { openURL: vi.fn(() => Promise.resolve()) };

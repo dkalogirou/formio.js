@@ -2,6 +2,7 @@
  * The page that runs inside the WebView. It is a regular consumer of
  * afse-formio-react and talks to the native side only through `protocol.ts`.
  */
+import './storage-guard';
 import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { AfseForm, AfseProvider, useAfseForm } from 'afse-formio-react';

@@ -19,7 +19,9 @@
   "files": [
     "dist"
   ],
-  "sideEffects": false,
+  "sideEffects": [
+    "./host/**"
+  ],
   "scripts": {
     "build:host": "node scripts/build-host.mjs",
     "build": "npm run build:host && tsup",
